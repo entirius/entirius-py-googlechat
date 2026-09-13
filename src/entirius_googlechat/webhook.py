@@ -13,6 +13,9 @@ from entirius_googlechat.errors import GoogleChatError
 
 logger = logging.getLogger(__name__)
 
+# httpx/httpcore log the full request URL at INFO/DEBUG; the webhook URL holds `key` + `token`.
+_URL_LOGGING_LIBRARIES = ("httpx", "httpcore")
+
 
 class GoogleChatWebhook:
     """Posts messages to one Google Chat incoming webhook.
@@ -25,6 +28,8 @@ class GoogleChatWebhook:
         self._url = url
         self._timeout = timeout
         self._max_retries = max(1, max_retries)
+        for name in _URL_LOGGING_LIBRARIES:
+            logging.getLogger(name).setLevel(logging.WARNING)
 
     def send_text(self, text: str) -> str:
         """Send a plain-text message; returns the created message `name`."""
@@ -59,7 +64,15 @@ class GoogleChatWebhook:
             raise GoogleChatError(None, type(exc).__name__) from None
         if response.status_code >= 400:
             raise GoogleChatError(response.status_code, response.reason_phrase)
-        return response.json().get("name", "")
+        return self._message_name(response)
+
+    @staticmethod
+    def _message_name(response: httpx.Response) -> str:
+        """Best-effort `name` from a 2xx body; a non-JSON or non-object body is still a successful post."""
+        try:
+            return response.json().get("name", "")
+        except (ValueError, AttributeError):
+            return ""
 
     @staticmethod
     def _retryable(exc: GoogleChatError) -> bool:

@@ -37,4 +37,7 @@ Same rule applies to PR descriptions: no `Generated with [Claude Code]` footer.
 - `errors.py` — `GoogleChatError(status_code, message)`; `status_code` is `None` for transport errors.
 - The webhook URL carries `key` + `token` — it is a secret. It is never logged and never put into an exception
   message; transport exceptions are re-raised without their cause (httpx messages can embed the URL).
+  Constructing the client raises the `httpx` and `httpcore` loggers to WARNING — both log the full request URL
+  at INFO/DEBUG.
+- Any 2xx is success; the message `name` is parsed best-effort (`""` for a non-JSON or non-object body).
 - No Django dependency; consumers (e.g. `entirius-django-notifications`) soft-import it.

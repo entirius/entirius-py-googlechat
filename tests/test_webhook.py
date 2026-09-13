@@ -86,3 +86,31 @@ def test_webhook_url_never_logged_or_in_error(caplog):
     rendered = f"{exc_info.value!s} {exc_info.value!r} {exc_info.value.__cause__!r} {caplog.text}"
     assert "SECRET" not in rendered
     assert exc_info.value.__cause__ is None
+
+
+@respx.mock
+def test_webhook_url_never_logged_at_info(caplog, monkeypatch):
+    monkeypatch.setattr(logging.getLogger("httpx"), "level", logging.NOTSET)
+    caplog.set_level(logging.INFO)
+    respx.post(URL).mock(side_effect=[httpx.Response(200, json={"name": "m/5"})] + [httpx.Response(503)] * 3)
+    webhook = GoogleChatWebhook(URL)
+    webhook.send_text("ok")
+    with pytest.raises(GoogleChatError):
+        webhook.send_text("fails")
+    messages = [record.getMessage() for record in caplog.records]
+    assert messages, "the 503 retries must log a warning"
+    assert not [m for m in messages if "key=" in m or "token=" in m]
+
+
+@respx.mock
+@pytest.mark.parametrize(
+    "response",
+    [
+        httpx.Response(200, text="<html>ok</html>", headers={"content-type": "text/html"}),
+        httpx.Response(200, json=["not", "an", "object"]),
+    ],
+    ids=["html", "list"],
+)
+def test_non_json_object_2xx_is_success(response):
+    respx.post(URL).mock(return_value=response)
+    assert GoogleChatWebhook(URL).send_text("x") == ""
