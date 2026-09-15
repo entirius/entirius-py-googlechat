@@ -19,7 +19,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev  = ["ruff", "pre-commit"]
-test = ["pytest"]
+test = ["pytest", "respx"]
 
 [project.urls]
 Repository = "https://github.com/entirius/entirius-py-googlechat"
