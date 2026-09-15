@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.0 — unreleased
+## 0.1.0 — 2026-09-15
 
 First release: a framework-free client for Google Chat incoming webhooks, used by the chat channel of
 `entirius-django-notifications`.
