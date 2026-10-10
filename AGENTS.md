@@ -2,12 +2,8 @@
 
 entirius-py-googlechat — Google Chat incoming-webhook client: text and card messages with retries.
 Distribution `entirius-py-googlechat`, import `entirius_googlechat`. Plain Python library, no Django.
-
-## Quick Reference
-
-- Python ≥ 3.11, `httpx`, `uv`, ruff, hatchling, pytest + respx, MPL-2.0.
-- Read first: `docs/install.md` (host) · `docs/api.md` (caller) · `docs/concept.md` (why) ·
-  `docs/gotchas.md` (before editing). This file is the map; it explains nothing twice.
+Python ≥ 3.11, `httpx`, `uv`, ruff, hatchling, pytest + respx, MPL-2.0. Read first: `docs/install.md` (host) ·
+`docs/api.md` (caller) · `docs/concept.md` (why) · `docs/gotchas.md` (before editing).
 
 ## Commands
 
@@ -26,7 +22,7 @@ Distribution `entirius-py-googlechat`, import `entirius_googlechat`. Plain Pytho
 - Framework-free: no Django import, no settings, no env reads — the caller passes the URL.
 - Git flow: `develop` + `master`, PRs, semver tag on `master`. Do not commit by default — the operator decides.
 
-## Map
+## Architecture
 
 ```
 src/entirius_googlechat/
@@ -36,9 +32,7 @@ src/entirius_googlechat/
 tests/test_webhook.py
 ```
 
-## Where things live
-
-| Question | Answer |
+| Topic | Where |
 |---|---|
 | Method signatures, payload shapes, return value | `docs/api.md` |
 | Retry policy, backoff, what is final | `docs/api.md` § Retries; `webhook.py` `_retryable` |
@@ -46,19 +40,6 @@ tests/test_webhook.py
 | Secret handling, logging side effects | `docs/gotchas.md` |
 | Which test covers what | `docs/testing.md` |
 | What changed and why | `CHANGELOG.md` |
-
-## Testing
-
-- `respx` intercepts every request; an autouse fixture records `time.sleep` delays instead of sleeping.
-- Tests use a URL with `SECRETKEY` / `SECRETTOKEN` and assert those strings never reach logs or exceptions —
-  every new error path keeps that assertion.
-
-## Testing end-to-end
-
-- Edge cases covered here: N-03 (webhook 5xx retried, then raised — `test_N03_5xx_retries_then_raises`).
-- No one-shot tags; the library has no BDD scenarios of its own — chat delivery is exercised through
-  `entirius-django-notifications`.
-- Guides: portal `guides/leads-end-to-end-testing.md`; emporium test package `docs/e2e-leads-funnel.md`.
 
 ## Gotchas
 

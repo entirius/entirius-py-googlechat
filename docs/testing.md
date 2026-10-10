@@ -21,7 +21,7 @@ and can assert the backoff.
 | `test_send_text_payload` | `{"text": …}` body, returned message `name` |
 | `test_send_card_payload` | `cardsV2` header, text paragraph, button with `openLink` |
 | `test_send_card_without_button_has_one_widget` | no button unless both button fields are set |
-| `test_N03_5xx_retries_then_raises` | edge case N-03: 3 attempts on 503, sleeps `[1, 2]`, `status_code` kept |
+| `test_N03_5xx_retries_then_raises` | webhook 5xx retried, then raised: 3 attempts on 503, sleeps `[1, 2]`, `status_code` kept |
 | `test_transport_error_retried_then_succeeds` | a transport error is retried, the next 2xx wins |
 | `test_4xx_no_retry` | one request on 400, raised at once |
 | `test_webhook_url_never_logged_or_in_error` | an httpx message embedding the URL leaks into neither the exception, its cause, nor the log |
@@ -39,5 +39,6 @@ the URL would end up in CI configuration.
 
 ## End-to-end
 
-The library has no end-to-end suite of its own. Its behaviour in the leads platform is exercised through
-`entirius-django-notifications`; see the portal guide `guides/leads-end-to-end-testing.md`.
+The library has no end-to-end suite and no BDD scenarios of its own, and no one-shot tags. Its behaviour in the
+leads platform is exercised through `entirius-django-notifications`. Guides: the Entirius documentation at
+https://docs.entirius.com/ and `docs/e2e-leads-funnel.md` in the emporium test package.
